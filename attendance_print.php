@@ -1,9 +1,25 @@
 <?php
 session_start();
+
+// Timeout sesji w sekundach (10 minut)
+$timeout = 600;
+
+// Sprawdzenie, czy administrator jest zalogowany
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
+
+// Sprawdzenie ostatniej aktywności
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php?timeout=1");
+    exit();
+}
+
+// Aktualizacja czasu ostatniej aktywności
+$_SESSION['last_activity'] = time();
 
 require 'insert1.php';
 
@@ -12,129 +28,181 @@ $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll
 
 // Wybrany miesiąc i rok
 $selectedMonth = $_GET['month'] ?? date("m");
-$selectedYear = $_GET['year'] ?? date("Y");
+$selectedYear  = $_GET['year'] ?? date("Y");
 
 // Obliczenie liczby dni w miesiącu
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
 
-// Pobranie obecności w wybranym miesiącu
+// Pobranie obecności
 $startDate = "$selectedYear-$selectedMonth-01";
-$endDate = "$selectedYear-$selectedMonth-$daysInMonth";
+$endDate   = "$selectedYear-$selectedMonth-$daysInMonth";
 
-$stmt = $pdo->prepare("SELECT attendance.*, employees.full_name 
-                       FROM attendance 
-                       JOIN employees ON employees.id = attendance.employee_id
-                       WHERE date BETWEEN ? AND ?");
+$stmt = $pdo->prepare("
+    SELECT attendance.*, employees.full_name 
+    FROM attendance 
+    JOIN employees ON employees.id = attendance.employee_id
+    WHERE date BETWEEN ? AND ?
+");
 $stmt->execute([$startDate, $endDate]);
 $records = $stmt->fetchAll();
 
-// Tworzymy tablicę obecności: $attendance[day][employee_id] = 'Imię Nazwisko'
+// Tablica obecności — true = obecny
 $attendance = [];
 foreach ($records as $rec) {
     $day = (int)date("j", strtotime($rec['date']));
-    $attendance[$day][$rec['employee_id']] = $rec['full_name'];
+    $attendance[$day][$rec['employee_id']] = true;
 }
+
+// Podział na strony — po 6 osób
+$chunkedEmployees = array_chunk($employees, 6);
 ?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Podgląd wydruku - Lista obecności</title>
+<title>Lista obecności — podgląd</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body { font-family:'Times New Roman', serif; }
-table { page-break-inside: auto; }
-tr    { page-break-inside: avoid; page-break-after: auto; }
-th, td { text-align: center; vertical-align: middle; min-width: 100px; }
+body { font-family: 'Times New Roman', serif; }
+
+th, td { 
+    text-align: center;
+    vertical-align: middle;
+    width: 120px;
+}
+
+/* Ukrycie NAV w druku + styl tabeli */
 @media print {
-    .no-print { display: none; }
+    .no-print { display:none!important; }
+    .page { page-break-after: always; }
+
+    table td, table th {
+        padding: 9px 10px !important;
+        font-size: 11px !important;
+        line-height: 1 !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    body { margin: 0; padding: 0; }
 }
 </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+
+<!-- NAV (tylko poza drukiem) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 no-print">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
-            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
     <div class="collapse navbar-collapse" id="navbarMenu">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+        <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
+        <li class="nav-item"><a class="nav-link" href="employee_add.php">Dodaj pracownika</a></li>
         <li class="nav-item">
-             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
+            <span class="nav-link text-warning" id="session-timer"></span>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin.php">Lista obecności</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="employees.php">Pracownicy</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="employee_add.php">Dodaj pracownika</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Wyloguj</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
       </ul>
     </div>
   </div>
 </nav>
-<div class="container my-4">
-    <h2 class="text-center mb-4">Podgląd wydruku - Lista obecności</h2>
 
-    <form method="GET" class="row g-3 mb-4 no-print">
+<div class="container no-print mb-4">
+    <form method="GET" class="row g-3">
         <div class="col-md-3">
             <label>Miesiąc</label>
             <select class="form-select" name="month">
                 <?php for($m=1;$m<=12;$m++): ?>
-                    <option value="<?php echo $m; ?>" <?php if($selectedMonth==$m) echo 'selected'; ?>>
-                        <?php echo date("F", mktime(0,0,0,$m,1)); ?>
+                    <option value="<?= $m ?>" <?= ($selectedMonth==$m?'selected':'') ?>>
+                        <?= date("F", mktime(0,0,0,$m,1)) ?>
                     </option>
                 <?php endfor; ?>
             </select>
         </div>
+
         <div class="col-md-3">
             <label>Rok</label>
-            <input type="number" class="form-control" name="year" value="<?php echo $selectedYear; ?>">
+            <input type="number" class="form-control" name="year" value="<?= $selectedYear ?>">
         </div>
+
         <div class="col-md-3 d-flex align-items-end">
             <button class="btn btn-primary w-100">Filtruj</button>
         </div>
+
         <div class="col-md-3 d-flex align-items-end">
-            <button type="button" class="btn btn-success w-100" onclick="window.print()">Drukuj</button>
+            <button type="button" onclick="window.print()" class="btn btn-success w-100">Drukuj</button>
         </div>
     </form>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Dzień</th>
-                    <?php foreach ($employees as $emp): ?>
-                        <th><?php echo $emp['full_name']; ?></th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php for($day=1;$day<=$daysInMonth;$day++): ?>
-                    <tr>
-                        <td><?php echo $day; ?></td>
-                        <?php foreach ($employees as $emp): ?>
-                            <td>
-                                <?php 
-                                // Wyświetlamy nazwisko jeśli obecny
-                                echo $attendance[$day][$emp['id']] ?? ''; 
-                                ?>
-                            </td>
-                        <?php endforeach; ?>
-                    </tr>
-                <?php endfor; ?>
-            </tbody>
-        </table>
-    </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<?php foreach ($chunkedEmployees as $pageEmployees): ?>
+<div class="page px-3">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Dzień</th>
+            <?php foreach ($pageEmployees as $emp): ?>
+                <th><?= $emp['full_name'] ?></th>
+            <?php endforeach; ?>
+        </tr>
+        </thead>
+
+        <tbody>
+        <?php for ($day = 1; $day <= $daysInMonth; $day++): ?>
+            <?php
+                $dayDate = "$selectedYear-$selectedMonth-" . str_pad($day, 2, "0", STR_PAD_LEFT);
+                $today   = date("Y-m-d");
+                $nowTime = date("H:i");
+            ?>
+            <tr>
+                <td><?= $day ?></td>
+                <?php foreach ($pageEmployees as $emp): ?>
+                    <td>
+                    <?php
+                        $id = $emp['id'];
+                        $isPresent = isset($attendance[$day][$id]);
+
+                        if ($isPresent) {
+                            echo $emp['full_name'];
+                        } else {
+                            if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
+                                echo "-";
+                            } else {
+                                echo "";
+                            }
+                        }
+                    ?>
+                    </td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endfor; ?>
+        </tbody>
+    </table>
+</div>
+<?php endforeach; ?>
+
+<script>
+// Licznik sesji w navbarze
+let remaining = <?= $timeout ?>;
+function updateTimer() {
+    let min = Math.floor(remaining / 60);
+    let sec = remaining % 60;
+    document.getElementById('session-timer').textContent = `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
+    if (remaining <= 0) window.location.href='logout.php';
+    else remaining--;
+}
+setInterval(updateTimer, 1000);
+updateTimer();
+</script>
+
 </body>
 </html>

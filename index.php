@@ -43,8 +43,6 @@
 <div class="container mt-5">
     <div class="form-container">
         <h2 class="mb-4 text-center">Rejestracja obecności</h2>
-
-        <!-- Wyświetlanie komunikatów -->
         <?php if (isset($_GET['status'])): ?>
             <?php
                 $status = $_GET['status'];
@@ -91,8 +89,6 @@
                 ?>
             </div>
         <?php endif; ?>
-
-        <!-- Formularz bez daty -->
         <form action="insert.php" method="POST">
             <div class="mb-3">
                 <label for="fullName" class="form-label">Imię i nazwisko</label>

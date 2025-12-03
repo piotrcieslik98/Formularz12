@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'insert1.php'; // połączenie z bazą
+require 'insert1.php';
 
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';

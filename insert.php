@@ -51,7 +51,7 @@ if ($exists) {
     exit();
 }
 
-// Zapis nowej obecności
+
 $insert = $pdo->prepare("INSERT INTO attendance (employee_id, date, time) VALUES (?, ?, ?)");
 $success = $insert->execute([$employeeId, $today, date("H:i:s")]);
 
