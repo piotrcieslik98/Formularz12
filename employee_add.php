@@ -55,6 +55,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
         <a href="employees.php" class="btn btn-secondary">Powrót</a>
     </form>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

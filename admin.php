@@ -56,6 +56,9 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
+             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="admin.php">Lista obecności</a>
         </li>
         <li class="nav-item">
@@ -102,7 +105,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             </div>
         </form>
 
-        <!-- Tabela wyników -->
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -130,6 +132,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
