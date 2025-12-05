@@ -62,6 +62,8 @@ th, td {
     }
     body { margin: 0; padding: 0; }
 }
+.card { border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+.navbar .timer { color: #ffc107; margin-left: 10px; }
 </style>
 </head>
 <body>

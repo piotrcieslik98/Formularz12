@@ -67,6 +67,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     <table class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
+                <th></th>
                 <th>Imię i nazwisko</th>
                 <th>Akcje</th>
             </tr>
