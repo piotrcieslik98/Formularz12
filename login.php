@@ -19,28 +19,22 @@ body {
 </style>
 </head>
 <body>
-
 <div class="card p-4">
     <h3 class="text-center mb-3">Panel administratora</h3>
-
     <?php if (isset($_GET['error'])): ?>
         <div class="alert alert-danger">Nieprawidłowy login lub hasło.</div>
     <?php endif; ?>
-
     <form action="login_check.php" method="POST">
         <div class="mb-3">
             <label>Login</label>
             <input type="text" class="form-control" name="username" required>
         </div>
-
         <div class="mb-3">
             <label>Hasło</label>
             <input type="password" class="form-control" name="password" required>
         </div>
-
         <button class="btn btn-primary w-100">Zaloguj</button>
     </form>
 </div>
-
 </body>
 </html>

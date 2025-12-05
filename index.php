@@ -31,15 +31,12 @@
       h2 { font-weight: 600; color: #343a40; }
   </style>
 </head>
-
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="index.php">Rejestr</a>
   </div>
 </nav>
-
 <div class="container mt-5">
     <div class="form-container">
         <h2 class="mb-4 text-center">Rejestracja obecności</h2>
@@ -57,7 +54,6 @@
                 ];
                 $statusClass = $classMap[$status] ?? 'alert-warning';
             ?>
-
             <div class="alert <?php echo $statusClass; ?> mb-4">
                 <?php
                     switch ($status) {
@@ -94,14 +90,12 @@
                 <label for="fullName" class="form-label">Imię i nazwisko</label>
                 <input type="text" class="form-control" id="fullName" name="fullName" required />
             </div>
-
             <button type="submit" class="btn btn-primary w-100 mt-3">
                 Zarejestruj obecność
             </button>
         </form>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

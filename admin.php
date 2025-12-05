@@ -1,25 +1,19 @@
 <?php
 session_start();
-
-
 $timeout = 600; 
-
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
-
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
     header("Location: login.php?timeout=1");
     exit();
 }
-
 $_SESSION['last_activity'] = time();
 require 'insert1.php';
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
-
 $selectedDate = $_GET['date'] ?? date("Y-m-d");
 $selectedEmployee = $_GET['employee'] ?? "";
 
@@ -34,7 +28,6 @@ if (!empty($selectedEmployee)) {
     $params[] = $selectedEmployee;
 }
 $query .= " ORDER BY time ASC";
-
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $records = $stmt->fetchAll();
@@ -52,7 +45,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
@@ -60,7 +52,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
@@ -76,9 +67,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
           <a class="nav-link" href="employees.php">Pracownicy</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="employee_add.php">Dodaj pracownika</a>
-        </li>
-        <li class="nav-item">
           <span class="nav-link timer" id="session-timer"></span>
         </li>
         <li class="nav-item">
@@ -88,7 +76,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </div>
   </div>
 </nav>
-
 <div class="container">
     <div class="card p-4">
         <h2 class="mb-4 text-center">Lista obecności</h2>
@@ -97,7 +84,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
                 <label class="form-label">Data</label>
                 <input type="date" class="form-control" name="date" value="<?php echo $selectedDate; ?>">
             </div>
-
             <div class="col-md-4">
                 <label class="form-label">Pracownik</label>
                 <select class="form-select" name="employee">
@@ -110,16 +96,14 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div class="col-md-4 d-flex align-items-end">
                 <button class="btn btn-primary w-100">Filtruj</button>
             </div>
         </form>
-
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th>#</th>
+                    <th></th>
                     <th>Imię i nazwisko</th>
                     <th>Data</th>
                     <th>Godzina</th>
@@ -142,11 +126,9 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
         </table>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let remaining = <?php echo $timeout; ?>;
-
 function updateTimer() {
     let minutes = Math.floor(remaining / 60);
     let seconds = remaining % 60;
@@ -161,6 +143,5 @@ function updateTimer() {
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
-
 </body>
 </html>

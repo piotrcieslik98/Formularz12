@@ -1,42 +1,24 @@
 <?php
 session_start();
-
-// Timeout sesji w sekundach (10 minut)
 $timeout = 600;
-
-// Sprawdzenie, czy administrator jest zalogowany
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
-
-// Sprawdzenie ostatniej aktywności
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
     header("Location: login.php?timeout=1");
     exit();
 }
-
-// Aktualizacja czasu ostatniej aktywności
 $_SESSION['last_activity'] = time();
-
 require 'insert1.php';
-
-// Pobranie pracowników
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
-
-// Wybrany miesiąc i rok
 $selectedMonth = $_GET['month'] ?? date("m");
 $selectedYear  = $_GET['year'] ?? date("Y");
-
-// Obliczenie liczby dni w miesiącu
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
-
-// Pobranie obecności
 $startDate = "$selectedYear-$selectedMonth-01";
 $endDate   = "$selectedYear-$selectedMonth-$daysInMonth";
-
 $stmt = $pdo->prepare("
     SELECT attendance.*, employees.full_name 
     FROM attendance 
@@ -45,15 +27,11 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$startDate, $endDate]);
 $records = $stmt->fetchAll();
-
-// Tablica obecności — true = obecny
 $attendance = [];
 foreach ($records as $rec) {
     $day = (int)date("j", strtotime($rec['date']));
     $attendance[$day][$rec['employee_id']] = true;
 }
-
-// Podział na strony — po 6 osób
 $chunkedEmployees = array_chunk($employees, 6);
 ?>
 <!DOCTYPE html>
@@ -61,61 +39,59 @@ $chunkedEmployees = array_chunk($employees, 6);
 <head>
 <meta charset="UTF-8">
 <title>Lista obecności — podgląd</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
 body { font-family: 'Times New Roman', serif; }
-
 th, td { 
     text-align: center;
     vertical-align: middle;
     width: 120px;
 }
-
-/* Ukrycie NAV w druku + styl tabeli */
 @media print {
     .no-print { display:none!important; }
     .page { page-break-after: always; }
-
     table td, table th {
         padding: 9px 10px !important;
         font-size: 11px !important;
         line-height: 1 !important;
     }
-
     table {
         border-collapse: collapse !important;
         margin: 0 !important;
         width: 100% !important;
     }
-
     body { margin: 0; padding: 0; }
 }
 </style>
 </head>
-
 <body>
-
-<!-- NAV (tylko poza drukiem) -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 no-print">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
-        <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
-        <li class="nav-item"><a class="nav-link" href="employee_add.php">Dodaj pracownika</a></li>
         <li class="nav-item">
-            <span class="nav-link text-warning" id="session-timer"></span>
+             <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>
         </li>
-        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
+        <li class="nav-item">
+             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="admin.php">Lista obecności</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="employees.php">Pracownicy</a>
+        </li>
+        <li class="nav-item">
+          <span class="nav-link timer" id="session-timer"></span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">Wyloguj</a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
-
 <div class="container no-print mb-4">
     <form method="GET" class="row g-3">
         <div class="col-md-3">
@@ -128,22 +104,18 @@ th, td {
                 <?php endfor; ?>
             </select>
         </div>
-
         <div class="col-md-3">
             <label>Rok</label>
             <input type="number" class="form-control" name="year" value="<?= $selectedYear ?>">
         </div>
-
         <div class="col-md-3 d-flex align-items-end">
             <button class="btn btn-primary w-100">Filtruj</button>
         </div>
-
         <div class="col-md-3 d-flex align-items-end">
             <button type="button" onclick="window.print()" class="btn btn-success w-100">Drukuj</button>
         </div>
     </form>
 </div>
-
 <?php foreach ($chunkedEmployees as $pageEmployees): ?>
 <div class="page px-3">
     <table class="table table-bordered">
@@ -155,7 +127,6 @@ th, td {
             <?php endforeach; ?>
         </tr>
         </thead>
-
         <tbody>
         <?php for ($day = 1; $day <= $daysInMonth; $day++): ?>
             <?php
@@ -170,7 +141,6 @@ th, td {
                     <?php
                         $id = $emp['id'];
                         $isPresent = isset($attendance[$day][$id]);
-
                         if ($isPresent) {
                             echo $emp['full_name'];
                         } else {
@@ -189,9 +159,7 @@ th, td {
     </table>
 </div>
 <?php endforeach; ?>
-
 <script>
-// Licznik sesji w navbarze
 let remaining = <?= $timeout ?>;
 function updateTimer() {
     let min = Math.floor(remaining / 60);
@@ -203,6 +171,5 @@ function updateTimer() {
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
-
 </body>
 </html>
