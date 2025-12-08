@@ -32,9 +32,19 @@
   </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="index.php">Rejestr</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item my-1 my-lg-0 ms-lg-2">
+          <a href="index1.php" class="btn btn-outline-primary w-100 w-lg-auto">Wyjścia służbowe w godzinach pracy</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 <div class="container mt-5">

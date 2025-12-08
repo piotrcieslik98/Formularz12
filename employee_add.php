@@ -36,6 +36,9 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
+             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
+        </li>
+        <li class="nav-item">
              <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>
         </li>
         <li class="nav-item">
@@ -70,15 +73,17 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let remaining = <?php echo $timeout; ?>;
+let logoutTime = <?= time() + $timeout ?> * 1000; 
 function updateTimer() {
-    let minutes = Math.floor(remaining / 60);
-    let seconds = remaining % 60;
-    document.getElementById('session-timer').textContent = `Wylogowanie za: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;    
-    if (remaining <= 0) {
+    let now = new Date().getTime();
+    let remainingMs = logoutTime - now;
+    if (remainingMs <= 0) {
         window.location.href = 'logout.php';
     } else {
-        remaining--;
+        let min = Math.floor(remainingMs / 60000);
+        let sec = Math.floor((remainingMs % 60000) / 1000);
+        document.getElementById('session-timer').textContent =
+            `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
     }
 }
 setInterval(updateTimer, 1000);

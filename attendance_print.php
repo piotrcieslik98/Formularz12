@@ -33,6 +33,20 @@ foreach ($records as $rec) {
     $attendance[$day][$rec['employee_id']] = true;
 }
 $chunkedEmployees = array_chunk($employees, 6);
+$polishMonths = [
+    1 => "Styczeń",
+    2 => "Luty",
+    3 => "Marzec",
+    4 => "Kwiecień",
+    5 => "Maj",
+    6 => "Czerwiec",
+    7 => "Lipiec",
+    8 => "Sierpień",
+    9 => "Wrzesień",
+    10 => "Październik",
+    11 => "Listopad",
+    12 => "Grudzień"
+];
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -73,23 +87,14 @@ th, td {
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-             <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>
+             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
         </li>
-        <li class="nav-item">
-             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin.php">Lista obecności</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="employees.php">Pracownicy</a>
-        </li>
-        <li class="nav-item">
-          <span class="nav-link timer" id="session-timer"></span>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Wyloguj</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+        <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
+        <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
+        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
       </ul>
     </div>
   </div>
@@ -101,7 +106,7 @@ th, td {
             <select class="form-select" name="month">
                 <?php for($m=1;$m<=12;$m++): ?>
                     <option value="<?= $m ?>" <?= ($selectedMonth==$m?'selected':'') ?>>
-                        <?= date("F", mktime(0,0,0,$m,1)) ?>
+                        <?= $polishMonths[$m] ?>
                     </option>
                 <?php endfor; ?>
             </select>
@@ -140,19 +145,20 @@ th, td {
                 <td><?= $day ?></td>
                 <?php foreach ($pageEmployees as $emp): ?>
                     <td>
-                    <?php
-                        $id = $emp['id'];
-                        $isPresent = isset($attendance[$day][$id]);
-                        if ($isPresent) {
-                            echo $emp['full_name'];
-                        } else {
-                            if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
-                                echo "-";
+                        <?php
+                            $id = $emp['id'];
+                            $isPresent = isset($attendance[$day][$id]);
+
+                            if ($isPresent) {
+                                echo $emp['full_name'];
                             } else {
-                                echo "";
+                                if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
+                                    echo "-";
+                                } else {
+                                    echo "";
+                                }
                             }
-                        }
-                    ?>
+                        ?>
                     </td>
                 <?php endforeach; ?>
             </tr>
@@ -162,13 +168,18 @@ th, td {
 </div>
 <?php endforeach; ?>
 <script>
-let remaining = <?= $timeout ?>;
+let logoutTime = <?= time() + $timeout ?> * 1000; 
 function updateTimer() {
-    let min = Math.floor(remaining / 60);
-    let sec = remaining % 60;
-    document.getElementById('session-timer').textContent = `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
-    if (remaining <= 0) window.location.href='logout.php';
-    else remaining--;
+    let now = new Date().getTime();
+    let remainingMs = logoutTime - now;
+    if (remainingMs <= 0) {
+        window.location.href = 'logout.php';
+    } else {
+        let min = Math.floor(remainingMs / 60000);
+        let sec = Math.floor((remainingMs % 60000) / 1000);
+        document.getElementById('session-timer').textContent =
+            `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
+    }
 }
 setInterval(updateTimer, 1000);
 updateTimer();
