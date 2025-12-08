@@ -2,7 +2,7 @@
 session_start();
 $timeout = 600;
 if (!isset($_SESSION['admin_logged'])) {
-    header("Location: login.php");
+    header("Location: login.php?timeout=1");
     exit();
 }
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
@@ -12,13 +12,17 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     exit();
 }
 $_SESSION['last_activity'] = time();
+
 require 'insert1.php';
+
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
 $selectedMonth = $_GET['month'] ?? date("m");
 $selectedYear  = $_GET['year'] ?? date("Y");
+
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
 $startDate = "$selectedYear-$selectedMonth-01";
 $endDate   = "$selectedYear-$selectedMonth-$daysInMonth";
+
 $stmt = $pdo->prepare("
     SELECT attendance.*, employees.full_name 
     FROM attendance 
@@ -27,25 +31,19 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$startDate, $endDate]);
 $records = $stmt->fetchAll();
+
 $attendance = [];
 foreach ($records as $rec) {
     $day = (int)date("j", strtotime($rec['date']));
     $attendance[$day][$rec['employee_id']] = true;
 }
+
 $chunkedEmployees = array_chunk($employees, 6);
+
 $polishMonths = [
-    1 => "Styczeń",
-    2 => "Luty",
-    3 => "Marzec",
-    4 => "Kwiecień",
-    5 => "Maj",
-    6 => "Czerwiec",
-    7 => "Lipiec",
-    8 => "Sierpień",
-    9 => "Wrzesień",
-    10 => "Październik",
-    11 => "Listopad",
-    12 => "Grudzień"
+    1 => "Styczeń", 2 => "Luty", 3 => "Marzec", 4 => "Kwiecień",
+    5 => "Maj",     6 => "Czerwiec", 7 => "Lipiec", 8 => "Sierpień",
+    9 => "Wrzesień",10 => "Październik",11 => "Listopad",12 => "Grudzień"
 ];
 ?>
 <!DOCTYPE html>
@@ -61,6 +59,15 @@ th, td {
     vertical-align: middle;
     width: 120px;
 }
+/* Jasnoszare tło weekendów */
+.weekend td {
+    background-color: #f2f2f2 !important;
+}
+
+.weekend {
+    background-color: #f2f2f2 !important;
+}
+
 @media print {
     .no-print { display:none!important; }
     .page { page-break-after: always; }
@@ -76,19 +83,19 @@ th, td {
     }
     body { margin: 0; padding: 0; }
 }
+
 .card { border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
 .navbar .timer { color: #ffc107; margin-left: 10px; }
 </style>
 </head>
 <body>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 no-print">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
         <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
@@ -99,6 +106,7 @@ th, td {
     </div>
   </div>
 </nav>
+
 <div class="container no-print mb-4">
     <form method="GET" class="row g-3">
         <div class="col-md-3">
@@ -111,18 +119,22 @@ th, td {
                 <?php endfor; ?>
             </select>
         </div>
+
         <div class="col-md-3">
             <label>Rok</label>
             <input type="number" class="form-control" name="year" value="<?= $selectedYear ?>">
         </div>
+
         <div class="col-md-3 d-flex align-items-end">
             <button class="btn btn-primary w-100">Filtruj</button>
         </div>
+
         <div class="col-md-3 d-flex align-items-end">
             <button type="button" onclick="window.print()" class="btn btn-success w-100">Drukuj</button>
         </div>
     </form>
 </div>
+
 <?php foreach ($chunkedEmployees as $pageEmployees): ?>
 <div class="page px-3">
     <table class="table table-bordered">
@@ -135,14 +147,20 @@ th, td {
         </tr>
         </thead>
         <tbody>
+
         <?php for ($day = 1; $day <= $daysInMonth; $day++): ?>
             <?php
                 $dayDate = "$selectedYear-$selectedMonth-" . str_pad($day, 2, "0", STR_PAD_LEFT);
+                $weekday = date("N", strtotime($dayDate)); // 6 = sobota, 7 = niedziela
+                $isWeekend = ($weekday == 6 || $weekday == 7);
+
                 $today   = date("Y-m-d");
                 $nowTime = date("H:i");
             ?>
-            <tr>
+
+            <tr class="<?= $isWeekend ? 'weekend' : '' ?>">
                 <td><?= $day ?></td>
+
                 <?php foreach ($pageEmployees as $emp): ?>
                     <td>
                         <?php
@@ -154,35 +172,41 @@ th, td {
                             } else {
                                 if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
                                     echo "-";
-                                } else {
-                                    echo "";
                                 }
                             }
                         ?>
                     </td>
                 <?php endforeach; ?>
             </tr>
+
         <?php endfor; ?>
+
         </tbody>
     </table>
 </div>
 <?php endforeach; ?>
+
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000; 
+
 function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;
+
     if (remainingMs <= 0) {
-        window.location.href = 'logout.php';
+        window.location.href = 'login.php?timeout=1';
     } else {
         let min = Math.floor(remainingMs / 60000);
         let sec = Math.floor((remainingMs % 60000) / 1000);
+
         document.getElementById('session-timer').textContent =
             `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
     }
 }
+
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
+
 </body>
 </html>

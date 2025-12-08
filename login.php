@@ -21,6 +21,11 @@ body {
 <body>
 <div class="card p-4">
     <h3 class="text-center mb-3">Panel administratora</h3>
+    <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
+        <div class="alert alert-warning text-center">
+            Zostałeś wylogowany z powodu 10 minut braku aktywności.
+        </div>
+    <?php endif; ?>
     <?php if (isset($_GET['error'])): ?>
         <div class="alert alert-danger">Nieprawidłowy login lub hasło.</div>
     <?php endif; ?>

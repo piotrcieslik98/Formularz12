@@ -2,7 +2,7 @@
 session_start();
 $timeout = 600; 
 if (!isset($_SESSION['admin_logged'])) {
-    header("Location: login.php");
+header("Location: login.php?timeout=1");
     exit();
 }
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
@@ -98,7 +98,7 @@ function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;
     if (remainingMs <= 0) {
-        window.location.href = 'logout.php';
+        window.location.href = 'login.php?timeout=1';
     } else {
         let min = Math.floor(remainingMs / 60000);
         let sec = Math.floor((remainingMs % 60000) / 1000);

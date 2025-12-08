@@ -2,7 +2,7 @@
 session_start();
 $timeout = 600; 
 if (!isset($_SESSION['admin_logged'])) {
-    header("Location: login.php");
+    header("Location: login.php?timeout=1");
     exit();
 }
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
@@ -124,15 +124,16 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
     <p class="text-center text-muted">Brak wyników pasujących do kryteriów.</p>
 <?php else: ?>
 <table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Data</th>
-            <th>Imię i nazwisko</th>
-            <th>Godzina wyjścia</th>
-            <th>Godzina przyjścia</th>
-            <th>Cel wyjścia</th>
-        </tr>
-    </thead>
+   <thead class="table-dark">
+    <tr>
+        <th>Data</th>
+        <th>Imię i nazwisko</th>
+        <th>Godzina wyjścia</th>
+        <th>Godzina przyjścia</th>
+        <th>Cel wyjścia</th>
+        <th>Akcje</th>
+    </tr>
+</thead>
     <tbody>
     <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
@@ -141,6 +142,12 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
             <td><?= date('H:i', strtotime($row['godzina_wyjscia'])) ?></td>
             <td><?= date('H:i', strtotime($row['godzina_przyjscia'])) ?></td>
             <td><?= htmlspecialchars($row['cel']) ?></td>
+            <td>
+                <a href="edit_record.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edytuj</a>
+                 <a href="delete_record.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm"
+                onclick="return confirm('Czy na pewno chcesz usunąć ten rekord?');">Usuń</a>
+            </td>
+
         </tr>
     <?php endwhile; ?>
     </tbody>
@@ -170,7 +177,7 @@ function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;   
     if (remainingMs <= 0) {
-        window.location.href = 'logout.php';
+        window.location.href = 'login.php?timeout=1';
     } else {
         let min = Math.floor(remainingMs / 60000);
         let sec = Math.floor((remainingMs % 60000) / 1000);
