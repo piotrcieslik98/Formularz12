@@ -1,4 +1,14 @@
-<?php session_start(); ?>
+<?php
+// Jeśli timeout → wyczyść błędną sesję
+if (isset($_GET['timeout']) && $_GET['timeout'] == 1) {
+    session_start();
+    session_unset();
+    session_destroy();
+}
+
+// Start nowej sesji na stronie logowania
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -21,14 +31,17 @@ body {
 <body>
 <div class="card p-4">
     <h3 class="text-center mb-3">Panel administratora</h3>
+
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
         <div class="alert alert-warning text-center">
             Zostałeś wylogowany z powodu 10 minut braku aktywności.
         </div>
     <?php endif; ?>
+
     <?php if (isset($_GET['error'])): ?>
         <div class="alert alert-danger">Nieprawidłowy login lub hasło.</div>
     <?php endif; ?>
+
     <form action="login_check.php" method="POST">
         <div class="mb-3">
             <label>Login</label>
