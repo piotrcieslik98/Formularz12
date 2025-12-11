@@ -35,6 +35,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item">
              <a class="nav-link" href="admin_tables.php">Ewidencja</a>
         </li>

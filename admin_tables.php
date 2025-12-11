@@ -75,8 +75,9 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item">
-             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
+             <a class="nav-link active" href="admin_tables.php">Ewidencja</a>
         </li>
         <li class="nav-item">
              <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>

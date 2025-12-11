@@ -37,6 +37,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item">
              <a class="nav-link" href="admin_tables.php">Ewidencja</a>
         </li>
@@ -50,7 +51,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
           <a class="nav-link" href="admin.php">Lista obecności</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="employees.php">Pracownicy</a>
+          <a class="nav-link active" href="employees.php">Pracownicy</a>
         </li>
         <li class="nav-item">
           <span class="nav-link timer" id="session-timer"></span>

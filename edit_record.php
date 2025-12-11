@@ -82,6 +82,7 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto">
+         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
