@@ -53,6 +53,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
         <li class="nav-item">
           <a class="nav-link active" href="employees.php">Pracownicy</a>
         </li>
+        <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
         <li class="nav-item">
           <span class="nav-link timer" id="session-timer"></span>
         </li>

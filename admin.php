@@ -22,12 +22,10 @@ $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll
 $selectedDate = $_GET['date'] ?? date("Y-m-d");
 $selectedEmployee = $_GET['employee'] ?? "";
 
-/* ---- POBIERANIE INFORMACJI O ŚWIĘCIE ---- */
 $holidayQuery = $pdo->prepare("SELECT description FROM holidays WHERE date = ?");
 $holidayQuery->execute([$selectedDate]);
 $holiday = $holidayQuery->fetchColumn();
 
-/* ---- USUWANIE WPISU ---- */
 if (isset($_GET['delete_id'])) {
     $deleteStmt = $pdo->prepare("DELETE FROM attendance WHERE id = ?");
     $deleteStmt->execute([$_GET['delete_id']]);
@@ -35,7 +33,6 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
-/* ---- LISTA OBECNOŚCI ---- */
 $query = "SELECT attendance.*, employees.full_name 
           FROM attendance 
           JOIN employees ON employees.id = attendance.employee_id
@@ -77,12 +74,13 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
-        <li class="nav-item active"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+        <li class="nav-item"><a class="nav-link active" href="admin.php">Lista obecności</a></li>
         <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
+        <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
         <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
         <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
       </ul>
@@ -118,7 +116,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             </div>
         </form>
 
-        <!-- INFORMACJA O ŚWIĘCIE -->
         <?php if ($holiday): ?>
             <div class="alert alert-warning text-center fw-bold">
                 Dzień <?php echo $selectedDate; ?> jest świętem: <?php echo htmlspecialchars($holiday); ?>

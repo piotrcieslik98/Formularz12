@@ -91,6 +91,7 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
         <li class="nav-item">
           <a class="nav-link" href="employees.php">Pracownicy</a>
         </li>
+        <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
         <li class="nav-item">
           <span class="nav-link timer" id="session-timer"></span>
         </li>

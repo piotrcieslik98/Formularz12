@@ -82,7 +82,7 @@ body { font-family:'Times New Roman', serif; background: #f4f6f9; }
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item active"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+        <li class="nav-item"><a class="nav-link active" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item">
              <a class="nav-link" href="admin_tables.php">Ewidencja</a>
         </li>
