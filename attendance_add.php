@@ -120,7 +120,7 @@ body { font-family: 'Times New Roman', serif; }
             <input type="date" name="date" class="form-control" required>
         </div>
 
-        <button class="btn btn-success w-100">Zapisz obecność</button>
+        <button class="btn btn-primary w-100">Zapisz obecność</button>
     </form>
 </div>
 

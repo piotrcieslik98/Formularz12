@@ -98,6 +98,7 @@ body { font-family:'Times New Roman', serif; background: #f4f6f9; }
         <li class="nav-item">
           <a class="nav-link" href="employees.php">Pracownicy</a>
         </li>
+        <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
         <li class="nav-item">
           <span class="nav-link timer" id="session-timer"></span>
         </li>
@@ -125,12 +126,12 @@ body { font-family:'Times New Roman', serif; background: #f4f6f9; }
                 <input type="text" name="description" class="form-control" value="<?= $editHoliday['description'] ?? "" ?>" required>
             </div>
             <div class="mb-3">
-                <label>Symbol / code</label>
+                <label>Symbol na liście obecności</label>
                 <input type="text" name="code" class="form-control" value="<?= $editHoliday['code'] ?? "" ?>" required>
             </div>
-            <button class="btn btn-success w-100"><?= $editHoliday ? "Zaktualizuj" : "Dodaj" ?></button>
+            <button class="btn btn-primary w-100"><?= $editHoliday ? "Zaktualizuj" : "Dodaj" ?></button>
             <?php if($editHoliday): ?>
-                <a href="holidays.php" class="btn btn-secondary w-100 mt-2">Anuluj</a>
+                <a href="holidays.php" class="btn btn-primary w-100 mt-2">Anuluj</a>
             <?php endif; ?>
         </form>
     </div>

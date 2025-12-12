@@ -107,7 +107,7 @@ body { font-family:'Times New Roman', serif; background:#f4f6f9; }
                 <label class="form-label">Powtórz nowe hasło</label>
                 <input type="password" name="confirm_password" class="form-control" required>
             </div>
-            <button class="btn btn-success w-100">Zmień hasło</button>
+            <button class="btn btn-primary w-100">Zmień hasło</button>
         </form>
     </div>
 </div>
