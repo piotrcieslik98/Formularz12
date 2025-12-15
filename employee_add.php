@@ -55,7 +55,7 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             <label>Imię i nazwisko</label>
             <input type="text" name="full_name" class="form-control" required>
         </div>
-        <button class="btn btn-success">Zapisz</button>
+        <button class="btn btn-primary">Zapisz</button>
         <a href="employees.php" class="btn btn-secondary">Powrót</a>
     </form>
 </div>

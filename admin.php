@@ -55,12 +55,18 @@ $records = $stmt->fetchAll();
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel administratora</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 .card { border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
 .navbar .timer { color: #ffc107; margin-left: 10px; }
+.table th, .table td { text-align: center; vertical-align: middle; }
+.table-responsive { overflow-x: auto; }
+@media (max-width: 767px) {
+    .table th, .table td { white-space: nowrap; }
+}
 </style>
 </head>
 <body>
@@ -122,36 +128,39 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             </div>
         <?php endif; ?>
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Imię i nazwisko</th>
-                    <th>Data</th>
-                    <th>Ostatnia aktualizacja</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($records)): ?>
-                    <tr><td colspan="5" class="text-center">Brak wpisów</td></tr>
-                <?php else: ?>
-                    <?php foreach ($records as $i => $row): ?>
-                        <tr class="<?php if ($holiday) echo 'table-warning'; ?>">
-                            <td><?php echo $i + 1; ?></td>
-                            <td><?php echo $row['full_name']; ?></td>
-                            <td><?php echo $row['date']; ?></td>
-                            <td><?php echo $row['time']; ?></td>
-                            <td>
-                                <a href="?date=<?php echo $selectedDate; ?>&delete_id=<?php echo $row['id']; ?>"
-                                   onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');"
-                                   class="btn btn-danger btn-sm">Usuń</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <!-- Tabela przewijalna w poziomie na małych ekranach -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Imię i nazwisko</th>
+                        <th>Data</th>
+                        <th>Ostatnia aktualizacja</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($records)): ?>
+                        <tr><td colspan="5" class="text-center">Brak wpisów</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($records as $i => $row): ?>
+                            <tr class="<?php if ($holiday) echo 'table-warning'; ?>">
+                                <td><?php echo $i + 1; ?></td>
+                                <td><?php echo $row['full_name']; ?></td>
+                                <td><?php echo $row['date']; ?></td>
+                                <td><?php echo $row['time']; ?></td>
+                                <td>
+                                    <a href="?date=<?php echo $selectedDate; ?>&delete_id=<?php echo $row['id']; ?>"
+                                       onclick="return confirm('Czy na pewno chcesz usunąć ten wpis?');"
+                                       class="btn btn-danger btn-sm">Usuń</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 </div>
