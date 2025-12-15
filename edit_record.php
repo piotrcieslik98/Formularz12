@@ -76,13 +76,16 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
 </head>
 <body>
 
-<!-- NAVBAR identyczny jak w panelu -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
-      <ul class="navbar-nav ms-auto">
-         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
@@ -132,9 +135,9 @@ h2 { font-weight:600; text-align:center; margin-bottom:30px; }
     <a href="admin_tables.php" class="btn btn-secondary w-100 mt-2">Powrót</a>
 </form>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// TIMER SESJI — identyczny jak w admin_tables.php
+
 let logoutTime = <?= time() + $timeout ?> * 1000;
 
 function updateTimer() {

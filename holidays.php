@@ -1,12 +1,10 @@
 <?php
 session_start();
 $timeout = 600;
-
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
-
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
@@ -20,7 +18,6 @@ require 'insert1.php';
 
 $message = "";
 
-/* ---- DODAWANIE LUB EDYCJA DNIA WOLNEGO ---- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? "";
     $date = $_POST['date'] ?? "";
@@ -29,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($date && $description && $code) {
         if ($id) {
-            // Edycja
+            
             $stmt = $pdo->prepare("UPDATE holidays SET date=?, description=?, code=? WHERE id=?");
             $stmt->execute([$date, $description, $code, $id]);
             $message = "<div class='alert alert-success'>Dzień wolny został zaktualizowany.</div>";
         } else {
-            // Dodawanie
+            
             $stmt = $pdo->prepare("INSERT INTO holidays (date, description, code) VALUES (?, ?, ?)");
             $stmt->execute([$date, $description, $code]);
             $message = "<div class='alert alert-success'>Dzień wolny został dodany.</div>";
@@ -44,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-/* ---- USUWANIE DNIA WOLNEGO ---- */
 if (isset($_GET['delete_id'])) {
     $stmt = $pdo->prepare("DELETE FROM holidays WHERE id=?");
     $stmt->execute([$_GET['delete_id']]);
@@ -52,10 +48,7 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
-/* ---- POBIERANIE LISTY DNIA WOLNYCH ---- */
 $holidays = $pdo->query("SELECT * FROM holidays ORDER BY date DESC")->fetchAll();
-
-/* ---- POBIERANIE DANYCH DO EDYCJI ---- */
 $editHoliday = null;
 if (isset($_GET['edit_id'])) {
     $stmt = $pdo->prepare("SELECT * FROM holidays WHERE id=?");
@@ -80,31 +73,21 @@ body { font-family:'Times New Roman', serif; background: #f4f6f9; }
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link active" href="holidays.php">Dni wolne</a></li>
-        <li class="nav-item">
-             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
-        </li>
-        <li class="nav-item">
-             <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>
-        </li>
-        <li class="nav-item">
-             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin.php">Lista obecności</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="employees.php">Pracownicy</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+        <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
         <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
-        <li class="nav-item">
-          <span class="nav-link timer" id="session-timer"></span>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Wyloguj</a>
-        </li>
+        <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
+        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
       </ul>
     </div>
   </div>

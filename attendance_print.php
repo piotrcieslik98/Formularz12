@@ -12,18 +12,13 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     exit();
 }
 $_SESSION['last_activity'] = time();
-
 require 'insert1.php';
-
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
 $selectedMonth = $_GET['month'] ?? date("m");
 $selectedYear  = $_GET['year'] ?? date("Y");
-
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
 $startDate = "$selectedYear-$selectedMonth-01";
 $endDate   = "$selectedYear-$selectedMonth-$daysInMonth";
-
-/* Pobranie obecności */
 $stmt = $pdo->prepare("
     SELECT attendance.*, employees.full_name 
     FROM attendance 
@@ -39,16 +34,13 @@ foreach ($records as $rec) {
     $attendance[$day][$rec['employee_id']] = true;
 }
 
-/* Pobranie świąt z tabeli holidays (tylko symbol w kolumnie code) */
 $holidayStmt = $pdo->prepare("SELECT date, code FROM holidays WHERE date BETWEEN ? AND ?");
 $holidayStmt->execute([$startDate, $endDate]);
 $holidays = [];
 foreach ($holidayStmt->fetchAll() as $h) {
     $holidays[$h['date']] = $h['code'];
 }
-
 $chunkedEmployees = array_chunk($employees, 6);
-
 $polishMonths = [
     1 => "Styczeń", 2 => "Luty", 3 => "Marzec", 4 => "Kwiecień",
     5 => "Maj",     6 => "Czerwiec", 7 => "Lipiec", 8 => "Sierpień",
@@ -78,13 +70,16 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
 </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 no-print">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
-      <ul class="navbar-nav ms-auto">
-         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
         <li class="nav-item"><a class="nav-link active" href="attendance_print.php">Podgląd wydruku</a></li>
@@ -97,7 +92,6 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
     </div>
   </div>
 </nav>
-
 <div class="container no-print mb-4">
     <form method="GET" class="row g-3">
         <div class="col-md-3">
@@ -120,7 +114,6 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
         </div>
     </form>
 </div>
-
 <?php foreach ($chunkedEmployees as $pageEmployees): ?>
 <div class="page px-3">
     <table class="table table-bordered">
@@ -134,7 +127,12 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
         </thead>
         <tbody>
         <?php for ($day = 1; $day <= $daysInMonth; $day++):
-            $dayDate = "$selectedYear-$selectedMonth-" . str_pad($day, 2, "0", STR_PAD_LEFT);
+           $dayDate = sprintf(
+                '%04d-%02d-%02d',
+                $selectedYear,
+                $selectedMonth,
+                $day
+            );
             $weekday = date("N", strtotime($dayDate));
             $isWeekend = ($weekday == 6 || $weekday == 7);
             $today   = date("Y-m-d");
@@ -147,14 +145,14 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
                     $cell = "";
 
                     if (isset($attendance[$day][$id])) {
-                        $cell = $emp['full_name']; // obecny
+                        $cell = $emp['full_name']; 
                     } elseif (isset($holidays[$dayDate])) {
-                        $cell = $holidays[$dayDate]; // symbol ze świąt
+                        $cell = $holidays[$dayDate]; 
                     } elseif ($isWeekend) {
-                        $cell = "-"; // weekend
+                        $cell = "-"; 
                     } else {
                         if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
-                            $cell = "nb"; // brak obecności w dzień roboczy
+                            $cell = "nb"; 
                         }
                     }
                 ?>
@@ -166,7 +164,7 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
     </table>
 </div>
 <?php endforeach; ?>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000; 
 function updateTimer() {
@@ -184,6 +182,5 @@ function updateTimer() {
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
-
 </body>
 </html>

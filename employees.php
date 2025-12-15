@@ -37,29 +37,15 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
-        <li class="nav-item">
-             <a class="nav-link" href="admin_tables.php">Ewidencja</a>
-        </li>
-        <li class="nav-item">
-             <a class="nav-link" href="attendance_add.php">Dodaj obecność</a>
-        </li>
-        <li class="nav-item">
-             <a class="nav-link" href="attendance_print.php">Podgląd wydruku</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin.php">Lista obecności</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="employees.php">Pracownicy</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+        <li class="nav-item"><a class="nav-link active" href="employees.php">Pracownicy</a></li>
         <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
-        <li class="nav-item">
-          <span class="nav-link timer" id="session-timer"></span>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Wyloguj</a>
-        </li>
+        <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
+        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
       </ul>
     </div>
   </div>

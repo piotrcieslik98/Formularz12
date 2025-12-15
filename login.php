@@ -1,12 +1,12 @@
 <?php
-// Jeśli timeout → wyczyść błędną sesję
+
 if (isset($_GET['timeout']) && $_GET['timeout'] == 1) {
     session_start();
     session_unset();
     session_destroy();
 }
 
-// Start nowej sesji na stronie logowania
+
 session_start();
 ?>
 <!DOCTYPE html>

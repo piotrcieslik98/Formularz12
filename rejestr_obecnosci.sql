@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2025 at 01:39 PM
+-- Generation Time: Dec 15, 2025 at 12:04 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -30,15 +30,16 @@ SET time_zone = "+00:00";
 CREATE TABLE `admins` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `password_changed_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 
 --
 -- Dumping data for table `admins`
 --
 
-INSERT INTO `admins` (`id`, `username`, `password`) VALUES
-(1, 'admin', '$2y$10$62cUQwsHcCk5nLDtEhjFmee/.YLeHy8C3Zkv5l4TZqAaj.QtREXWC');
+INSERT INTO `admins` (`id`, `username`, `password`, `password_changed_at`) VALUES
+(1, 'admin', '$2y$10$62cUQwsHcCk5nLDtEhjFmee/.YLeHy8C3Zkv5l4TZqAaj.QtREXWC', '2025-12-15 09:01:43');
 
 -- --------------------------------------------------------
 
@@ -65,7 +66,9 @@ INSERT INTO `attendance` (`id`, `employee_id`, `date`, `time`) VALUES
 (7, 1, '2025-12-02', '2025-12-08 00:00:00'),
 (15, 1, '2025-12-09', '2025-12-09 08:45:05'),
 (16, 1, '2025-12-10', '2025-12-10 10:30:20'),
-(19, 1, '2025-12-11', '2025-12-11 11:15:22');
+(19, 1, '2025-12-11', '2025-12-11 11:15:22'),
+(20, 1, '2025-12-12', '2025-12-12 07:44:14'),
+(21, 1, '2025-12-15', '2025-12-15 07:38:33');
 
 -- --------------------------------------------------------
 
@@ -116,7 +119,8 @@ INSERT INTO `ewidencja` (`id`, `imie_nazwisko`, `data`, `godzina_wyjscia`, `godz
 (8, 'Piotr Cieślik', '2025-11-25', '15:00:00', '15:30:00', 'poczta', '2025-11-26 08:32:54'),
 (11, 'Piotr Cieślik', '2025-12-08', '15:00:00', '15:30:00', 'poczta', '2025-12-08 13:15:24'),
 (12, 'Piotr Cieślik', '2025-12-09', '15:00:00', '15:30:00', 'poczta', '2025-12-10 13:12:39'),
-(13, 'Piotr Cieślik', '2025-12-10', '15:00:00', '15:30:00', 'poczta', '2025-12-10 13:13:06');
+(13, 'Piotr Cieślik', '2025-12-10', '15:00:00', '15:30:00', 'poczta', '2025-12-10 13:13:06'),
+(14, 'Piotr Cieślik', '2025-12-15', '15:00:00', '15:30:00', 'poczta', '2025-12-15 11:03:55');
 
 -- --------------------------------------------------------
 
@@ -139,7 +143,8 @@ INSERT INTO `holidays` (`id`, `date`, `code`, `description`) VALUES
 (1, '2025-12-24', 'Ś', 'Wigilia'),
 (4, '2025-12-25', 'Ś', 'Boże narodzenie '),
 (5, '2025-12-26', 'Ś', 'Boże narodzenie '),
-(6, '2026-01-01', 'Ś', 'Nowy rok');
+(6, '2026-01-01', 'Ś', 'Nowy rok'),
+(7, '2026-01-06', 'Ś', 'Świeto Trzech Króli');
 
 --
 -- Indeksy dla zrzutów tabel
@@ -193,7 +198,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `employees`
@@ -205,13 +210,13 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `ewidencja`
 --
 ALTER TABLE `ewidencja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `holidays`
 --
 ALTER TABLE `holidays`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables

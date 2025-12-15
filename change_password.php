@@ -74,12 +74,16 @@ body { font-family:'Times New Roman', serif; background:#f4f6f9; }
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
-    <div class="collapse navbar-collapse">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMenu">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
         <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
         <li class="nav-item"><a class="nav-link" href="attendance_add.php">Dodaj obecność</a></li>
-        <li class="nav-item"><a class="nav-link active" href="attendance_print.php">Podgląd wydruku</a></li>
+        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
         <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
         <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
         <li class="nav-item"><a class="nav-link active" href="change_password.php">Zmień hasło</a></li>
@@ -111,7 +115,7 @@ body { font-family:'Times New Roman', serif; background:#f4f6f9; }
         </form>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000;
 
