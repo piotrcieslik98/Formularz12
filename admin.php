@@ -1,52 +1,41 @@
 <?php
 session_start();
 $timeout = 600; 
-
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
-
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
     header("Location: login.php?timeout=1");
     exit();
 }
-
 $_SESSION['last_activity'] = time();
-
 require 'insert1.php';
-
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
 $selectedDate = $_GET['date'] ?? date("Y-m-d");
 $selectedEmployee = $_GET['employee'] ?? "";
-
 $holidayQuery = $pdo->prepare("SELECT description FROM holidays WHERE date = ?");
 $holidayQuery->execute([$selectedDate]);
 $holiday = $holidayQuery->fetchColumn();
-
 if (isset($_GET['delete_id'])) {
     $deleteStmt = $pdo->prepare("DELETE FROM attendance WHERE id = ?");
     $deleteStmt->execute([$_GET['delete_id']]);
     header("Location: ".$_SERVER['PHP_SELF']."?date=".$selectedDate.(!empty($selectedEmployee) ? "&employee=".$selectedEmployee : ""));
     exit();
 }
-
 $query = "SELECT attendance.*, employees.full_name 
           FROM attendance 
           JOIN employees ON employees.id = attendance.employee_id
           WHERE date = ?";
 
 $params = [$selectedDate];
-
 if (!empty($selectedEmployee)) {
     $query .= " AND employee_id = ?";
     $params[] = $selectedEmployee;
 }
-
 $query .= " ORDER BY time ASC";
-
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $records = $stmt->fetchAll();
@@ -70,7 +59,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
@@ -93,17 +81,14 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </div>
   </div>
 </nav>
-
 <div class="container">
     <div class="card p-4">
         <h2 class="mb-4 text-center">Lista obecności</h2>
-
         <form method="GET" class="row g-3 mb-4">
             <div class="col-md-4">
                 <label class="form-label">Data</label>
                 <input type="date" class="form-control" name="date" value="<?php echo $selectedDate; ?>">
             </div>
-
             <div class="col-md-4">
                 <label class="form-label">Pracownik</label>
                 <select class="form-select" name="employee">
@@ -116,24 +101,20 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div class="col-md-4 d-flex align-items-end">
                 <button class="btn btn-primary w-100">Filtruj</button>
             </div>
         </form>
-
         <?php if ($holiday): ?>
             <div class="alert alert-warning text-center fw-bold">
                 Dzień <?php echo $selectedDate; ?> jest świętem: <?php echo htmlspecialchars($holiday); ?>
             </div>
         <?php endif; ?>
-
-        <!-- Tabela przewijalna w poziomie na małych ekranach -->
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th>
+                        <th></th>
                         <th>Imię i nazwisko</th>
                         <th>Data</th>
                         <th>Ostatnia aktualizacja</th>
@@ -161,15 +142,11 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000;
-
 function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;
@@ -183,10 +160,8 @@ function updateTimer() {
             `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
     }
 }
-
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
-
 </body>
 </html>

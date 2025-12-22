@@ -10,7 +10,7 @@ if (!isset($_SESSION['admin_logged'])) {
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location: login.php?timeout=1");
     exit();
 }
 
@@ -22,49 +22,67 @@ $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll
 
 $message = "";
 
+/* =========================
+   OBSŁUGA FORMULARZA
+========================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $employee_id = $_POST['employee_id'];
-    $date = $_POST['date'];
+    $employee_id = $_POST['employee_id'] ?? '';
+    $date = $_POST['date'] ?? '';
 
-    if (!empty($employee_id) && !empty($date)) {
+    if ($employee_id && $date) {
 
-        // 🔥 SPRAWDZENIE CZY DATA JEST ŚWIĘTEM / DNIEM WOLNYM
-        $h = $pdo->prepare("SELECT * FROM holidays WHERE date = ?");
-        $h->execute([$date]);
-        $holiday = $h->fetch();
+        $formattedDate = date('d-m-Y', strtotime($date));
 
-        if ($holiday) {
-            $message = "<div class='alert alert-warning'>
-                <b>Nie można dodać obecności.</b><br>
-                Ten dzień jest oznaczony jako wolny: 
-                <b>{$holiday['code']}</b> — {$holiday['description']}
+        // 1️⃣ BLOKADA WEEKENDU
+        $dayOfWeek = date('N', strtotime($date)); // 6 = sobota, 7 = niedziela
+        if ($dayOfWeek >= 6) {
+            $message = "<div class='alert alert-danger'>
+                ❌ Nie można dodać obecności.<br>
+                Data <b>$formattedDate</b> przypada w weekend.
             </div>";
         } else {
 
-            // 🔍 Sprawdzenie czy obecność już istnieje
-            $stmt = $pdo->prepare("SELECT id FROM attendance WHERE employee_id=? AND date=?");
-            $stmt->execute([$employee_id, $date]);
-            $exists = $stmt->fetch();
+            // 2️⃣ BLOKADA ŚWIĘTA
+            $h = $pdo->prepare("SELECT * FROM holidays WHERE date = ?");
+            $h->execute([$date]);
+            $holiday = $h->fetch();
 
-            if ($exists) {
+            if ($holiday) {
                 $message = "<div class='alert alert-warning'>
-                    Obecność dla tego dnia już istnieje.
+                    ❌ Nie można dodać obecności.<br>
+                    Dzień <b>$formattedDate</b> jest dniem wolnym:
+                    <b>{$holiday['code']}</b> — {$holiday['description']}
                 </div>";
             } else {
-                // ✔ Zapis obecności
+
+                // 3️⃣ SPRAWDZENIE DUPLIKATU
                 $stmt = $pdo->prepare(
-                    "INSERT INTO attendance (employee_id, date) VALUES (?, ?)"
+                    "SELECT id FROM attendance WHERE employee_id = ? AND date = ?"
                 );
                 $stmt->execute([$employee_id, $date]);
 
-                $message = "<div class='alert alert-success'>
-                    Obecność została zapisana.
-                </div>";
+                if ($stmt->fetch()) {
+                    $message = "<div class='alert alert-warning'>
+                        ⚠️ Obecność dla dnia <b>$formattedDate</b> już istnieje.
+                    </div>";
+                } else {
+
+                    // 4️⃣ ZAPIS OBECNOŚCI
+                    $stmt = $pdo->prepare(
+                        "INSERT INTO attendance (employee_id, date) VALUES (?, ?)"
+                    );
+                    $stmt->execute([$employee_id, $date]);
+
+                    $message = "<div class='alert alert-success'>
+                        ✅ Obecność została zapisana.
+                    </div>";
+                }
             }
         }
-
     } else {
-        $message = "<div class='alert alert-danger'>Wybierz pracownika i datę.</div>";
+        $message = "<div class='alert alert-danger'>
+            Wybierz pracownika i datę.
+        </div>";
     }
 }
 ?>
@@ -72,69 +90,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dodaj obecność</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-body { font-family: 'Times New Roman', serif; }
+body { background: #f4f6f9; font-family:'Times New Roman', serif; }
+.card { border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
 .navbar .timer { color: #ffc107; margin-left: 10px; }
 </style>
 </head>
 <body>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-  <div class="container">
+<div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
-            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+        <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarMenu">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
-        <li class="nav-item"><a class="nav-link active" href="attendance_add.php">Dodaj obecność</a></li>
-        <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
-        <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
-        <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
-        <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
-        <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
-      </ul>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="holidays.php">Dni wolne</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_tables.php">Ewidencja</a></li>
+            <li class="nav-item"><a class="nav-link active" href="attendance_add.php">Dodaj obecność</a></li>
+            <li class="nav-item"><a class="nav-link" href="attendance_print.php">Podgląd wydruku</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin.php">Lista obecności</a></li>
+            <li class="nav-item"><a class="nav-link" href="employees.php">Pracownicy</a></li>
+            <li class="nav-item"><a class="nav-link" href="change_password.php">Zmień hasło</a></li>
+            <li class="nav-item"><span class="nav-link timer" id="session-timer"></span></li>
+            <li class="nav-item"><a class="nav-link" href="logout.php">Wyloguj</a></li>
+        </ul>
     </div>
-  </div>
+</div>
 </nav>
 
-<div class="container mt-4">
-    <h3 class="mb-4">Dodaj obecność</h3>
+<div class="container">
+<h3 class="mb-4">Dodaj obecność</h3>
 
-    <?= $message ?>
+<?= $message ?>
 
-    <form method="POST" class="card p-4">
-        <div class="mb-3">
-            <label class="form-label">Pracownik:</label>
-            <select name="employee_id" class="form-select" required>
-                <option value="">-- wybierz pracownika --</option>
-                <?php foreach ($employees as $emp): ?>
-                    <option value="<?= $emp['id'] ?>"><?= $emp['full_name'] ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+<form method="POST" class="card p-4">
+    <div class="mb-3">
+        <label class="form-label">Pracownik</label>
+        <select name="employee_id" class="form-select" required>
+            <option value="">— wybierz —</option>
+            <?php foreach ($employees as $emp): ?>
+                <option value="<?= $emp['id'] ?>"><?= $emp['full_name'] ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Data obecności:</label>
-            <input type="date" name="date" class="form-control" required>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Data obecności</label>
+        <input type="date" name="date" class="form-control" required>
+    </div>
 
-        <button class="btn btn-primary w-100">Zapisz obecność</button>
-    </form>
+    <button class="btn btn-primary w-100">Zapisz obecność</button>
+</form>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000;
-
 function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;
-
     if (remainingMs <= 0) {
         window.location.href = 'login.php?timeout=1';
     } else {
@@ -144,7 +163,6 @@ function updateTimer() {
             `Wylogowanie za: ${min}:${sec < 10 ? '0'+sec : sec}`;
     }
 }
-
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>

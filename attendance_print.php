@@ -54,23 +54,101 @@ $polishMonths = [
 <title>Lista obecności — podgląd</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-body { font-family: 'Times New Roman', serif; }
-th, td { text-align: center; vertical-align: middle; width: 120px; }
-.weekend td { background-color: #f2f2f2 !important; }
-.weekend { background-color: #f2f2f2 !important; }
-@media print {
-    .no-print { display:none!important; }
-    .page { page-break-after: always; }
-    table td, table th { padding: 9px 10px !important; font-size: 11px !important; line-height: 1 !important; }
-    table { border-collapse: collapse !important; margin: 0 !important; width: 100% !important; }
-    body { margin: 0; padding: 0; }
+/* =========================
+   OGÓLNY STYL DLA PANELU
+========================= */
+body {
+    background: #f4f6f9;
+    font-family: 'Times New Roman', serif;
+    margin: 0;
+    padding: 0;
 }
-.card { border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
-.navbar .timer { color: #ffc107; margin-left: 10px; }
+
+.card {
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.navbar .timer {
+    color: #ffc107;
+    margin-left: 10px;
+}
+
+/* =========================
+   TABELA OGÓLNA
+========================= */
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+    min-width: 120px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.weekend td {
+    background-color: #f2f2f2;
+}
+
+/* Responsywność dla mniejszych ekranów */
+.table-responsive {
+    overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+    .table th, .table td {
+        white-space: nowrap;
+        font-size: 0.9rem;
+    }
+}
+
+/* =========================
+   STYL DO DRUKU
+========================= */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .page {
+        page-break-after: always;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 0 !important;
+    }
+
+    table th, table td {
+        padding: 8px 9px !important;
+        font-size: 11px !important;
+        line-height: 1 !important;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    body {
+        background: #fff !important;
+    }
+
+    .weekend td {
+        background-color: #f2f2f2 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 no-print">
   <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
@@ -152,7 +230,7 @@ th, td { text-align: center; vertical-align: middle; width: 120px; }
                         $cell = "-"; 
                     } else {
                         if ($dayDate < $today || ($dayDate == $today && $nowTime > "09:30")) {
-                            $cell = "nb"; 
+                            $cell = "N"; 
                         }
                     }
                 ?>
