@@ -4,13 +4,11 @@ require 'insert1.php';
 
 $timeout = 600;
 
-// Sprawdzenie czy admin jest zalogowany
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
 
-// Timeout sesji
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
@@ -19,7 +17,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 }
 $_SESSION['last_activity'] = time();
 
-// Pobranie danych zalogowanego admina
 $admin_id = $_SESSION['admin_id'] ?? null;
 if (!$admin_id) {
     header("Location: login.php");
@@ -27,8 +24,6 @@ if (!$admin_id) {
 }
 
 $message = "";
-
-// Obsługa formularza
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $oldPassword = $_POST['old_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';

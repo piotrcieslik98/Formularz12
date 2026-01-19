@@ -157,7 +157,7 @@ body { font-family:'Times New Roman', serif; background:#f4f6f9; }
 <table class="table table-striped table-hover">
 <thead class="table-dark">
 <tr>
-    <th>#</th>
+    <th></th>
     <th>Data</th>
     <th>Nazwa / opis</th>
     <th>Symbol</th>

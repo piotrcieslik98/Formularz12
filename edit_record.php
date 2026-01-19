@@ -2,13 +2,11 @@
 session_start();
 $timeout = 600;
 
-// Sprawdzenie logowania
 if (!isset($_SESSION['admin_logged'])) {
     header("Location: login.php");
     exit();
 }
 
-// Timeout sesji
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
     session_unset();
     session_destroy();
@@ -17,7 +15,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 }
 $_SESSION['last_activity'] = time();
 
-// Połączenie z bazą
 $host = 'localhost';
 $user = 'root';
 $password = '';
@@ -26,8 +23,6 @@ $conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) die("Błąd połączenia: " . $conn->connect_error);
 
 $id = intval($_GET['id']);
-
-// Pobierz rekord
 $sql = "SELECT * FROM ewidencja WHERE id = $id";
 $result = $conn->query($sql);
 if ($result->num_rows != 1) {
@@ -37,7 +32,6 @@ $record = $result->fetch_assoc();
 
 $msg = "";
 
-// Zapis edycji
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = $conn->real_escape_string($_POST['data']);
     $imie = $conn->real_escape_string($_POST['imie_nazwisko']);
@@ -54,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($conn->query($update_sql)) {
         $msg = "Dane zostały zapisane.";
-        // Odśwież dane po zapisie
         $record = $conn->query($sql)->fetch_assoc();
     } else {
         $msg = "Błąd podczas zapisywania.";

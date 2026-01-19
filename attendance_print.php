@@ -54,9 +54,7 @@ $polishMonths = [
 <title>Lista obecności — podgląd</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-/* =========================
-   OGÓLNY STYL DLA PANELU
-========================= */
+
 body {
     background: #f4f6f9;
     font-family: 'Times New Roman', serif;
@@ -76,9 +74,7 @@ body {
     margin-left: 10px;
 }
 
-/* =========================
-   TABELA OGÓLNA
-========================= */
+
 .table th, .table td {
     text-align: center;
     vertical-align: middle;
@@ -90,8 +86,6 @@ body {
 .weekend td {
     background-color: #f2f2f2;
 }
-
-/* Responsywność dla mniejszych ekranów */
 .table-responsive {
     overflow-x: auto;
 }
@@ -103,9 +97,6 @@ body {
     }
 }
 
-/* =========================
-   STYL DO DRUKU
-========================= */
 @media print {
     .no-print {
         display: none !important;

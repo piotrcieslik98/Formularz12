@@ -150,7 +150,6 @@ let logoutTime = <?= time() + $timeout ?> * 1000;
 function updateTimer() {
     let now = new Date().getTime();
     let remainingMs = logoutTime - now;
-
     if (remainingMs <= 0) {
         window.location.href = 'login.php?timeout=1';
     } else {

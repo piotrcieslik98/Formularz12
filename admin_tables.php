@@ -13,7 +13,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 }
 $_SESSION['last_activity'] = time();
 
-// Połączenie z bazą
 $host = 'localhost';
 $user = 'root';
 $password = '';
@@ -23,7 +22,6 @@ if ($conn->connect_error) {
   die("Błąd połączenia: " . $conn->connect_error);
 }
 
-// Filtry
 $nazwisko = $_GET['nazwisko'] ?? '';
 $data_od = $_GET['data_od'] ?? '';
 $data_do = $_GET['data_do'] ?? '';
@@ -37,7 +35,6 @@ if (!empty($data_od)) $where[] = "(data >= '" . $conn->real_escape_string($data_
 if (!empty($data_do)) $where[] = "(data <= '" . $conn->real_escape_string($data_do) . "')";
 $where_clause = !empty($where) ? " WHERE " . implode(" AND ", $where) : "";
 
-// Pobieranie rekordów
 $sql = "SELECT id, imie_nazwisko, data, godzina_wyjscia, godzina_przyjscia, cel 
         FROM ewidencja 
         $where_clause 
@@ -45,7 +42,6 @@ $sql = "SELECT id, imie_nazwisko, data, godzina_wyjscia, godzina_przyjscia, cel
         LIMIT $limit OFFSET $offset";
 $result = $conn->query($sql);
 
-// Liczenie wszystkich rekordów dla paginacji
 $count_sql = "SELECT COUNT(*) AS total FROM ewidencja $where_clause";
 $total_rows = $conn->query($count_sql)->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);

@@ -21,32 +21,21 @@ require 'insert1.php';
 $employees = $pdo->query("SELECT * FROM employees ORDER BY full_name")->fetchAll();
 
 $message = "";
-
-/* =========================
-   OBSŁUGA FORMULARZA
-========================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employee_id = $_POST['employee_id'] ?? '';
     $date = $_POST['date'] ?? '';
-
     if ($employee_id && $date) {
-
         $formattedDate = date('d-m-Y', strtotime($date));
-
-        // 1️⃣ BLOKADA WEEKENDU
-        $dayOfWeek = date('N', strtotime($date)); // 6 = sobota, 7 = niedziela
+        $dayOfWeek = date('N', strtotime($date)); 
         if ($dayOfWeek >= 6) {
             $message = "<div class='alert alert-danger'>
                 ❌ Nie można dodać obecności.<br>
                 Data <b>$formattedDate</b> przypada w weekend.
             </div>";
         } else {
-
-            // 2️⃣ BLOKADA ŚWIĘTA
             $h = $pdo->prepare("SELECT * FROM holidays WHERE date = ?");
             $h->execute([$date]);
             $holiday = $h->fetch();
-
             if ($holiday) {
                 $message = "<div class='alert alert-warning'>
                     ❌ Nie można dodać obecności.<br>
@@ -54,25 +43,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <b>{$holiday['code']}</b> — {$holiday['description']}
                 </div>";
             } else {
-
-                // 3️⃣ SPRAWDZENIE DUPLIKATU
                 $stmt = $pdo->prepare(
                     "SELECT id FROM attendance WHERE employee_id = ? AND date = ?"
                 );
                 $stmt->execute([$employee_id, $date]);
-
                 if ($stmt->fetch()) {
                     $message = "<div class='alert alert-warning'>
                         ⚠️ Obecność dla dnia <b>$formattedDate</b> już istnieje.
                     </div>";
                 } else {
-
-                    // 4️⃣ ZAPIS OBECNOŚCI
                     $stmt = $pdo->prepare(
                         "INSERT INTO attendance (employee_id, date) VALUES (?, ?)"
                     );
                     $stmt->execute([$employee_id, $date]);
-
                     $message = "<div class='alert alert-success'>
                         ✅ Obecność została zapisana.
                     </div>";
@@ -100,7 +83,6 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
 </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
 <div class="container">
     <a class="navbar-brand fw-bold" href="admin.php">Panel administratora</a>
@@ -122,12 +104,9 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
     </div>
 </div>
 </nav>
-
 <div class="container">
 <h3 class="mb-4">Dodaj obecność</h3>
-
 <?= $message ?>
-
 <form method="POST" class="card p-4">
     <div class="mb-3">
         <label class="form-label">Pracownik</label>
@@ -138,16 +117,13 @@ body { background: #f4f6f9; font-family:'Times New Roman', serif; }
             <?php endforeach; ?>
         </select>
     </div>
-
     <div class="mb-3">
         <label class="form-label">Data obecności</label>
         <input type="date" name="date" class="form-control" required>
     </div>
-
     <button class="btn btn-primary w-100">Zapisz obecność</button>
 </form>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let logoutTime = <?= time() + $timeout ?> * 1000;
@@ -166,6 +142,5 @@ function updateTimer() {
 setInterval(updateTimer, 1000);
 updateTimer();
 </script>
-
 </body>
 </html>
